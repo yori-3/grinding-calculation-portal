@@ -36,7 +36,7 @@ let currentCalculatorId = "";
 
 function init() {
   renderMenu();
-  renderTopPage();
+  openCalculator("cylindrical-grinding");
 }
 
 function renderMenu() {
@@ -374,13 +374,8 @@ function renderComingSoon(name) {
     <section class="empty-state">
       <h2>${name}</h2>
       <p>準備中</p>
-      <button type="button" class="primary-button" id="backToReady">円筒研削条件計算へ戻る</button>
     </section>
   `;
-
-  document.getElementById("backToReady").addEventListener("click", () => {
-    openCalculator(calculators[0].id);
-  });
 }
 
 init();
