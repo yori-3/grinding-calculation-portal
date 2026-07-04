@@ -31,7 +31,6 @@ const calculators = [
 const app = document.getElementById("app");
 const menuButtons = document.getElementById("menuButtons");
 let currentCalculatorId = "";
-let latestResultText = "";
 
 function init() {
   renderMenu();
@@ -75,12 +74,10 @@ function updateActiveMenu() {
 
 function renderTopPage() {
   currentCalculatorId = "";
-  latestResultText = "";
   updateActiveMenu();
   app.innerHTML = `
     <section class="empty-state">
-      <h2>計算メニュー</h2>
-      <p>使用する計算を選択してください。</p>
+      <h2>使用する計算を選択してください。</h2>
       <button type="button" class="primary-button" id="openFirstCalculator">円筒研削条件計算を開く</button>
     </section>
   `;
@@ -91,7 +88,6 @@ function renderTopPage() {
 }
 
 function renderCylindricalGrindingCalculator(calculator) {
-  latestResultText = "";
   app.innerHTML = `
     <div class="panel-heading">
       <h2>${calculator.name}</h2>
@@ -113,11 +109,7 @@ function renderCylindricalGrindingCalculator(calculator) {
         </div>
         <div class="action-row">
           <button type="button" class="primary-button" id="clearButton">クリア</button>
-          <button type="button" class="secondary-button" id="printButton">印刷</button>
-          <button type="button" class="secondary-button" id="copyButton">結果コピー</button>
-          <button type="button" class="secondary-button" id="topButton">トップへ戻る</button>
         </div>
-        <p class="copy-status" id="copyStatus" aria-live="polite"></p>
       </form>
       <section class="result-panel" aria-label="計算結果">
         <h3>計算結果</h3>
@@ -131,9 +123,6 @@ function renderCylindricalGrindingCalculator(calculator) {
   const form = document.getElementById("grindingForm");
   const inputs = form.querySelectorAll("input");
   const clearButton = document.getElementById("clearButton");
-  const printButton = document.getElementById("printButton");
-  const copyButton = document.getElementById("copyButton");
-  const topButton = document.getElementById("topButton");
 
   inputs.forEach((input) => {
     input.addEventListener("input", calculateCylindricalGrinding);
@@ -143,15 +132,10 @@ function renderCylindricalGrindingCalculator(calculator) {
     inputs.forEach((input) => {
       input.value = "";
     });
-    latestResultText = "";
     document.getElementById("resultArea").innerHTML = createResultRows("-", "-", "-", "-");
-    setCopyStatus("");
     document.getElementById("wheelSpeed").focus();
   });
 
-  printButton.addEventListener("click", () => window.print());
-  copyButton.addEventListener("click", copyLatestResult);
-  topButton.addEventListener("click", renderTopPage);
   document.getElementById("wheelSpeed").focus();
 }
 
@@ -169,9 +153,7 @@ function calculateCylindricalGrinding() {
 
   const error = validateInputs(values);
   if (error) {
-    latestResultText = "";
     resultArea.innerHTML = `<div class="error-message">${error}</div>`;
-    setCopyStatus("");
     return;
   }
 
@@ -180,9 +162,7 @@ function calculateCylindricalGrinding() {
   const e = Number(cutDepth);
 
   if (b === 0) {
-    latestResultText = "";
     resultArea.innerHTML = `<div class="error-message">砥石直径 b は0より大きい数値を入力してください</div>`;
-    setCopyStatus("");
     return;
   }
 
@@ -192,9 +172,7 @@ function calculateCylindricalGrinding() {
   const finishCut = roughCut / 9;
 
   if (![spindleSpeed, roughCut, fineCut, finishCut].every(Number.isFinite)) {
-    latestResultText = "";
     resultArea.innerHTML = `<div class="error-message">計算不能です。入力値を確認してください</div>`;
-    setCopyStatus("");
     return;
   }
 
@@ -205,24 +183,12 @@ function calculateCylindricalGrinding() {
     finishCut: `${finishCut.toFixed(3)} mm`
   };
 
-  latestResultText = [
-    "円筒研削条件計算",
-    `砥石周速 a: ${a} m/min`,
-    `砥石直径 b: ${b} mm`,
-    `切込み e: ${e} mm`,
-    `主軸回転数 f: ${results.spindleSpeed}`,
-    `荒切込: ${results.roughCut}`,
-    `精研切込: ${results.fineCut}`,
-    `仕上切込: ${results.finishCut}`
-  ].join("\n");
-
   resultArea.innerHTML = createResultRows(
     results.spindleSpeed,
     results.roughCut,
     results.fineCut,
     results.finishCut
   );
-  setCopyStatus("");
 }
 
 function validateInputs(values) {
@@ -270,29 +236,7 @@ function createResultRows(spindleSpeed, roughCut, fineCut, finishCut) {
   `;
 }
 
-async function copyLatestResult() {
-  if (!latestResultText) {
-    setCopyStatus("コピーできる計算結果がありません");
-    return;
-  }
-
-  try {
-    await navigator.clipboard.writeText(latestResultText);
-    setCopyStatus("計算結果をコピーしました");
-  } catch (error) {
-    setCopyStatus("コピーできませんでした。ブラウザの設定を確認してください");
-  }
-}
-
-function setCopyStatus(message) {
-  const copyStatus = document.getElementById("copyStatus");
-  if (copyStatus) {
-    copyStatus.textContent = message;
-  }
-}
-
 function renderComingSoon(name) {
-  latestResultText = "";
   app.innerHTML = `
     <section class="empty-state">
       <h2>${name}</h2>

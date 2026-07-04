@@ -105,22 +105,8 @@ body {
 }
 
 .menu-bar {
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 16px;
-  align-items: stretch;
+  display: block;
   margin-bottom: 18px;
-}
-
-.menu-title {
-  display: flex;
-  align-items: center;
-  padding: 16px 22px;
-  color: #ffffff;
-  background: var(--main-color);
-  border: 2px solid var(--main-dark);
-  font-size: 20px;
-  font-weight: 800;
 }
 
 .menu-buttons {
@@ -226,21 +212,13 @@ input[type="number"]:focus {
 
 .action-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-top: 24px;
 }
 
 .wide-button {
   grid-column: 1 / -1;
-}
-
-.copy-status {
-  min-height: 1.5em;
-  margin: 12px 0 0;
-  color: var(--main-color);
-  font-size: 15px;
-  font-weight: 800;
 }
 
 .result-panel h3 {
