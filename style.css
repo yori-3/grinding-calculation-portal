@@ -1,0 +1,420 @@
+:root {
+  --main-color: #1E4A8D;
+  --main-dark: #163768;
+  --border-color: #cfd6df;
+  --text-color: #0f172a;
+  --muted-color: #64748b;
+  --input-bg: #fff3a3;
+  --panel-bg: #ffffff;
+  --page-bg: #f4f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text-color);
+  background: var(--page-bg);
+  font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.site-header {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  min-height: 118px;
+  padding: 22px 32px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 390px;
+}
+
+.logo-mark {
+  position: relative;
+  width: 92px;
+  height: 64px;
+}
+
+.logo-line {
+  position: absolute;
+  display: block;
+  height: 13px;
+  background: var(--main-color);
+  transform: skewX(-28deg);
+}
+
+.logo-line-1 {
+  top: 4px;
+  left: 5px;
+  width: 78px;
+}
+
+.logo-line-2 {
+  top: 26px;
+  left: 22px;
+  width: 52px;
+}
+
+.logo-line-3 {
+  top: 48px;
+  left: 39px;
+  width: 34px;
+}
+
+.brand-name {
+  color: var(--main-color);
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: 10px;
+  line-height: 1;
+}
+
+.company-name {
+  margin-top: 8px;
+  color: var(--main-color);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 31px;
+  line-height: 1.3;
+}
+
+.header-title p {
+  margin: 8px 0 0;
+  color: var(--muted-color);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 18px auto 40px;
+}
+
+.menu-bar {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+
+.menu-title {
+  display: flex;
+  align-items: center;
+  padding: 16px 22px;
+  color: #ffffff;
+  background: var(--main-color);
+  border: 2px solid var(--main-dark);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.menu-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+button {
+  min-height: 56px;
+  border-radius: 3px;
+  border: 2px solid var(--main-color);
+  background: #ffffff;
+  color: var(--main-color);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover,
+button:focus-visible {
+  outline: 3px solid rgba(30, 74, 141, 0.18);
+  outline-offset: 2px;
+}
+
+.primary-button,
+.menu-button.active {
+  background: var(--main-color);
+  color: #ffffff;
+}
+
+.secondary-button {
+  background: #ffffff;
+  color: var(--main-color);
+}
+
+.content-panel {
+  min-height: 560px;
+  padding: 30px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+}
+
+.panel-heading {
+  margin-bottom: 24px;
+  border-bottom: 3px solid var(--main-color);
+  padding-bottom: 14px;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.panel-heading p {
+  margin: 6px 0 0;
+  color: var(--muted-color);
+  font-weight: 700;
+}
+
+.calculator-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 410px) 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.form-panel,
+.result-panel {
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+input[type="number"] {
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 14px;
+  border: 2px solid #a8a8a8;
+  border-radius: 2px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 25px;
+  font-weight: 800;
+}
+
+input[type="number"]:focus {
+  border-color: var(--main-color);
+  outline: 3px solid rgba(30, 74, 141, 0.16);
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.wide-button {
+  grid-column: 1 / -1;
+}
+
+.result-panel h3 {
+  margin: 0 0 16px;
+  color: var(--main-color);
+  font-size: 24px;
+}
+
+.result-box {
+  border: 2px solid var(--border-color);
+  background: #ffffff;
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(120px, 180px);
+  gap: 12px;
+  align-items: center;
+  min-height: 58px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.result-row:last-child {
+  border-bottom: 0;
+}
+
+.result-label {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.result-value {
+  text-align: right;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.error-message {
+  padding: 18px;
+  border: 2px solid #b91c1c;
+  background: #fff5f5;
+  color: #991b1b;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.empty-state {
+  padding: 42px;
+  border: 2px solid var(--border-color);
+  background: #ffffff;
+  text-align: center;
+}
+
+.empty-state h2 {
+  margin: 0 0 10px;
+  color: var(--main-color);
+  font-size: 28px;
+}
+
+.empty-state p {
+  margin: 0 0 24px;
+  color: var(--muted-color);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+@media print {
+  .menu-bar,
+  .action-row,
+  .header-title p {
+    display: none;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  .site-header,
+  .content-panel {
+    border: 0;
+  }
+
+  .page-shell {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .menu-bar,
+  .calculator-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .page-shell {
+    width: calc(100% - 20px);
+    margin-top: 10px;
+  }
+
+  .site-header {
+    padding: 16px 14px;
+  }
+
+  .logo-mark {
+    width: 72px;
+    height: 52px;
+  }
+
+  .logo-line {
+    height: 10px;
+  }
+
+  .logo-line-1 {
+    width: 62px;
+  }
+
+  .logo-line-2 {
+    top: 22px;
+    left: 18px;
+    width: 42px;
+  }
+
+  .logo-line-3 {
+    top: 40px;
+    left: 31px;
+    width: 28px;
+  }
+
+  .brand-name {
+    font-size: 32px;
+    letter-spacing: 6px;
+  }
+
+  .company-name {
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+
+  .header-title h1 {
+    font-size: 25px;
+  }
+
+  .menu-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .content-panel {
+    padding: 18px;
+  }
+
+  .form-panel,
+  .result-panel {
+    padding: 18px;
+  }
+
+  .action-row {
+    grid-template-columns: 1fr;
+  }
+
+  .result-row {
+    grid-template-columns: 1fr;
+  }
+
+  .result-value {
+    text-align: left;
+  }
+}
