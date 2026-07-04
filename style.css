@@ -125,7 +125,7 @@ body {
 
 .menu-buttons {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
 }
 
@@ -233,6 +233,14 @@ input[type="number"]:focus {
 
 .wide-button {
   grid-column: 1 / -1;
+}
+
+.copy-status {
+  min-height: 1.5em;
+  margin: 12px 0 0;
+  color: var(--main-color);
+  font-size: 15px;
+  font-weight: 800;
 }
 
 .result-panel h3 {
