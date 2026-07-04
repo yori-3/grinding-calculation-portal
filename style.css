@@ -175,6 +175,18 @@ button:focus-visible {
   align-items: start;
 }
 
+.shape-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 240px));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.shape-button.active {
+  background: var(--main-color);
+  color: #ffffff;
+}
+
 .form-panel,
 .result-panel {
   padding: 24px;
@@ -215,6 +227,15 @@ input[type="number"]:focus {
   grid-template-columns: 1fr;
   gap: 12px;
   margin-top: 24px;
+}
+
+.fixed-condition {
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  background: #f8fafc;
+  color: var(--main-color);
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .wide-button {
@@ -264,6 +285,13 @@ input[type="number"]:focus {
   color: #991b1b;
   font-size: 18px;
   font-weight: 800;
+}
+
+.calculation-note {
+  margin: 18px 0 0;
+  color: var(--muted-color);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .empty-state {
@@ -380,6 +408,10 @@ input[type="number"]:focus {
   }
 
   .menu-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .shape-switch {
     grid-template-columns: 1fr;
   }
 
