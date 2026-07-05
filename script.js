@@ -9,12 +9,14 @@ const calculators = [
   {
     id: "internal-grinding",
     name: "内径研削条件計算",
-    status: "comingSoon"
+    status: "comingSoon",
+    visible: false
   },
   {
     id: "surface-grinding",
     name: "平面研削条件計算",
-    status: "comingSoon"
+    status: "comingSoon",
+    visible: false
   },
   {
     id: "weight",
@@ -44,7 +46,7 @@ function init() {
 function renderMenu() {
   menuButtons.innerHTML = "";
 
-  calculators.forEach((calculator) => {
+  calculators.filter((calculator) => calculator.visible !== false).forEach((calculator) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "menu-button";
@@ -71,8 +73,9 @@ function openCalculator(calculatorId) {
 
 function updateActiveMenu() {
   const buttons = menuButtons.querySelectorAll(".menu-button");
+  const visibleCalculators = calculators.filter((calculator) => calculator.visible !== false);
   buttons.forEach((button, index) => {
-    button.classList.toggle("active", calculators[index].id === currentCalculatorId);
+    button.classList.toggle("active", visibleCalculators[index].id === currentCalculatorId);
   });
 }
 
