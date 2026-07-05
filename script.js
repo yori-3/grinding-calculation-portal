@@ -26,7 +26,9 @@ const calculators = [
   {
     id: "taper-angle",
     name: "テーパー角度計算",
-    status: "comingSoon"
+    status: "ready",
+    description: "図面条件からテーパー角度、径、長さを計算します。",
+    render: renderTaperCalculator
   }
 ];
 
@@ -367,6 +369,303 @@ function createWeightResultRow(weight) {
       <div class="result-value">${weight}</div>
     </div>
   `;
+}
+
+function renderTaperCalculator(calculator) {
+  app.innerHTML = `
+    <div class="panel-heading">
+      <h2>${calculator.name}</h2>
+      <p>${calculator.description}</p>
+    </div>
+    <div class="mode-switch" role="group" aria-label="テーパー計算モード切替">
+      <button type="button" class="mode-button active" data-mode="angle">角度を求める</button>
+      <button type="button" class="mode-button" data-mode="diameter">径を求める</button>
+      <button type="button" class="mode-button" data-mode="length">長さを求める</button>
+    </div>
+    <div class="calculator-layout">
+      <form class="form-panel" id="taperForm">
+        <div id="taperInputArea"></div>
+        <div class="action-row">
+          <button type="button" class="primary-button" id="clearTaperButton">クリア</button>
+        </div>
+      </form>
+      <section class="result-panel" aria-label="計算結果">
+        <h3>計算結果</h3>
+        <div id="taperResultArea" class="result-box">
+          ${createTaperResultRows([{ label: "結果", value: "-" }])}
+        </div>
+        <p class="calculation-note">本計算は一般的な円錐テーパーを対象としています。角度は片側角度を基準に計算しています。図面が片側角度か全角度かを確認して使用してください。</p>
+      </section>
+    </div>
+  `;
+
+  document.querySelectorAll(".mode-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      setTaperMode(button.dataset.mode);
+    });
+  });
+
+  document.getElementById("clearTaperButton").addEventListener("click", clearTaperInputs);
+  setTaperMode("angle");
+}
+
+function setTaperMode(mode) {
+  document.querySelectorAll(".mode-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.mode === mode);
+  });
+
+  document.getElementById("taperInputArea").innerHTML = getTaperInputs(mode);
+  document.getElementById("taperResultArea").innerHTML = createTaperResultRows([{ label: "結果", value: "-" }]);
+
+  const form = document.getElementById("taperForm");
+  form.querySelectorAll("input").forEach((input) => {
+    input.addEventListener("input", calculateTaper);
+    input.addEventListener("change", calculateTaper);
+  });
+
+  const firstInput = form.querySelector("input[type='number']");
+  if (firstInput) {
+    firstInput.focus();
+  }
+}
+
+function getTaperInputs(mode) {
+  if (mode === "diameter") {
+    return `
+      <div class="form-group">
+        <label for="baseDiameter">基準径（mm）</label>
+        <input id="baseDiameter" name="baseDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="diameterLength">テーパー長 L（mm）</label>
+        <input id="diameterLength" name="diameterLength" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="diameterAngle">片側角度 θ（度）</label>
+        <input id="diameterAngle" name="diameterAngle" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <div class="field-label">計算方向</div>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="diameterDirection" value="largeToSmall" checked>
+            大径から小径を求める
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="diameterDirection" value="smallToLarge">
+            小径から大径を求める
+          </label>
+        </div>
+      </div>
+    `;
+  }
+
+  if (mode === "length") {
+    return `
+      <div class="form-group">
+        <label for="lengthLargeDiameter">大径 D（mm）</label>
+        <input id="lengthLargeDiameter" name="lengthLargeDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="lengthSmallDiameter">小径 d（mm）</label>
+        <input id="lengthSmallDiameter" name="lengthSmallDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="lengthAngle">片側角度 θ（度）</label>
+        <input id="lengthAngle" name="lengthAngle" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+    `;
+  }
+
+  return `
+    <div class="form-group">
+      <label for="largeDiameter">大径 D（mm）</label>
+      <input id="largeDiameter" name="largeDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="smallDiameter">小径 d（mm）</label>
+      <input id="smallDiameter" name="smallDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="taperLength">テーパー長 L（mm）</label>
+      <input id="taperLength" name="taperLength" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+    </div>
+  `;
+}
+
+function calculateTaper() {
+  const mode = document.querySelector(".mode-button.active").dataset.mode;
+  const resultArea = document.getElementById("taperResultArea");
+  const calculation = mode === "diameter"
+    ? calculateTaperDiameter()
+    : mode === "length"
+      ? calculateTaperLength()
+      : calculateTaperAngle();
+
+  if (calculation.error) {
+    resultArea.innerHTML = `<div class="error-message">${calculation.error}</div>`;
+    return;
+  }
+
+  resultArea.innerHTML = createTaperResultRows(calculation.rows);
+}
+
+function calculateTaperAngle() {
+  const largeDiameter = document.getElementById("largeDiameter").value;
+  const smallDiameter = document.getElementById("smallDiameter").value;
+  const taperLength = document.getElementById("taperLength").value;
+  const values = [
+    { label: "大径 D", value: largeDiameter },
+    { label: "小径 d", value: smallDiameter },
+    { label: "テーパー長 L", value: taperLength }
+  ];
+  const error = validateInputs(values);
+  if (error) return { error };
+
+  const D = Number(largeDiameter);
+  const d = Number(smallDiameter);
+  const L = Number(taperLength);
+  if (D <= d) {
+    return { error: "大径 D は小径 d より大きい数値を入力してください" };
+  }
+
+  const diameterDifference = D - d;
+  const oneSideAngle = radToDeg(Math.atan((diameterDifference / 2) / L));
+  const fullAngle = oneSideAngle * 2;
+  const slopeValue = L / diameterDifference;
+
+  if (![diameterDifference, oneSideAngle, fullAngle, slopeValue].every(Number.isFinite)) {
+    return { error: "計算不能です。入力値を確認してください" };
+  }
+
+  return {
+    rows: [
+      { label: "径差", value: `${diameterDifference.toFixed(3)} mm` },
+      { label: "片側角度", value: `${oneSideAngle.toFixed(4)} °` },
+      { label: "片側角度（度分秒）", value: formatDms(oneSideAngle) },
+      { label: "全角度", value: `${fullAngle.toFixed(4)} °` },
+      { label: "全角度（度分秒）", value: formatDms(fullAngle) },
+      { label: "勾配", value: `1/${slopeValue.toFixed(3)}` }
+    ]
+  };
+}
+
+function calculateTaperDiameter() {
+  const baseDiameter = document.getElementById("baseDiameter").value;
+  const diameterLength = document.getElementById("diameterLength").value;
+  const diameterAngle = document.getElementById("diameterAngle").value;
+  const direction = document.querySelector("input[name='diameterDirection']:checked").value;
+  const values = [
+    { label: "基準径", value: baseDiameter },
+    { label: "テーパー長 L", value: diameterLength },
+    { label: "片側角度 θ", value: diameterAngle }
+  ];
+  const error = validateInputs(values);
+  if (error) return { error };
+
+  const base = Number(baseDiameter);
+  const L = Number(diameterLength);
+  const theta = Number(diameterAngle);
+  const diameterDifference = 2 * L * Math.tan(degToRad(theta));
+  const calculatedDiameter = direction === "largeToSmall"
+    ? base - diameterDifference
+    : base + diameterDifference;
+  const calculatedLabel = direction === "largeToSmall" ? "計算後の径（小径）" : "計算後の径（大径）";
+
+  if (![diameterDifference, calculatedDiameter].every(Number.isFinite)) {
+    return { error: "計算不能です。入力値を確認してください" };
+  }
+
+  if (calculatedDiameter <= 0) {
+    return { error: "計算後の径が0以下になります。入力値を確認してください" };
+  }
+
+  return {
+    rows: [
+      { label: "径差", value: `${diameterDifference.toFixed(3)} mm` },
+      { label: calculatedLabel, value: `${calculatedDiameter.toFixed(3)} mm` },
+      { label: "全角度", value: `${(theta * 2).toFixed(4)} °` }
+    ]
+  };
+}
+
+function calculateTaperLength() {
+  const largeDiameter = document.getElementById("lengthLargeDiameter").value;
+  const smallDiameter = document.getElementById("lengthSmallDiameter").value;
+  const taperAngle = document.getElementById("lengthAngle").value;
+  const values = [
+    { label: "大径 D", value: largeDiameter },
+    { label: "小径 d", value: smallDiameter },
+    { label: "片側角度 θ", value: taperAngle }
+  ];
+  const error = validateInputs(values);
+  if (error) return { error };
+
+  const D = Number(largeDiameter);
+  const d = Number(smallDiameter);
+  const theta = Number(taperAngle);
+  if (D <= d) {
+    return { error: "大径 D は小径 d より大きい数値を入力してください" };
+  }
+
+  const diameterDifference = D - d;
+  const taperLength = (diameterDifference / 2) / Math.tan(degToRad(theta));
+
+  if (![diameterDifference, taperLength].every(Number.isFinite) || taperLength <= 0) {
+    return { error: "計算不能です。入力値を確認してください" };
+  }
+
+  return {
+    rows: [
+      { label: "径差", value: `${diameterDifference.toFixed(3)} mm` },
+      { label: "テーパー長", value: `${taperLength.toFixed(3)} mm` },
+      { label: "全角度", value: `${(theta * 2).toFixed(4)} °` }
+    ]
+  };
+}
+
+function clearTaperInputs() {
+  const form = document.getElementById("taperForm");
+  form.querySelectorAll("input[type='number']").forEach((input) => {
+    input.value = "";
+  });
+  const firstDirection = form.querySelector("input[name='diameterDirection'][value='largeToSmall']");
+  if (firstDirection) {
+    firstDirection.checked = true;
+  }
+  document.getElementById("taperResultArea").innerHTML = createTaperResultRows([{ label: "結果", value: "-" }]);
+
+  const firstInput = form.querySelector("input[type='number']");
+  if (firstInput) {
+    firstInput.focus();
+  }
+}
+
+function createTaperResultRows(rows) {
+  return rows.map((row) => `
+    <div class="result-row">
+      <div class="result-label">${row.label}</div>
+      <div class="result-value">${row.value}</div>
+    </div>
+  `).join("");
+}
+
+function degToRad(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+function radToDeg(radians) {
+  return radians * 180 / Math.PI;
+}
+
+function formatDms(degrees) {
+  let totalSeconds = Math.round(degrees * 3600);
+  const sign = totalSeconds < 0 ? "-" : "";
+  totalSeconds = Math.abs(totalSeconds);
+  const d = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return `${sign}${d}°${String(m).padStart(2, "0")}′${String(s).padStart(2, "0")}″`;
 }
 
 function renderComingSoon(name) {

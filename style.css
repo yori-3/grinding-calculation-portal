@@ -175,14 +175,20 @@ button:focus-visible {
   align-items: start;
 }
 
-.shape-switch {
+.shape-switch,
+.mode-switch {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 240px));
   gap: 12px;
   margin-bottom: 24px;
 }
 
-.shape-button.active {
+.mode-switch {
+  grid-template-columns: repeat(3, minmax(0, 220px));
+}
+
+.shape-button.active,
+.mode-button.active {
   background: var(--main-color);
   color: #ffffff;
 }
@@ -205,6 +211,12 @@ label {
   font-weight: 800;
 }
 
+.field-label {
+  margin-bottom: 7px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
 input[type="number"] {
   width: 100%;
   min-height: 58px;
@@ -220,6 +232,29 @@ input[type="number"] {
 input[type="number"]:focus {
   border-color: var(--main-color);
   outline: 3px solid rgba(30, 74, 141, 0.16);
+}
+
+.radio-group {
+  display: grid;
+  gap: 10px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  font-size: 16px;
+}
+
+.radio-option input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--main-color);
 }
 
 .action-row {
@@ -354,7 +389,16 @@ input[type="number"]:focus {
   }
 
   .menu-buttons {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .menu-button {
+    min-height: 52px;
+    padding: 8px 6px;
+    font-size: 15px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -408,10 +452,16 @@ input[type="number"]:focus {
   }
 
   .menu-buttons {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .shape-switch {
+  .menu-button {
+    min-height: 48px;
+    font-size: 13px;
+  }
+
+  .shape-switch,
+  .mode-switch {
     grid-template-columns: 1fr;
   }
 
