@@ -390,7 +390,7 @@ function renderJisFitToleranceCalculator(calculator) {
     <div class="calculator-layout compact-calculator-layout">
       <form class="form-panel" id="toleranceForm">
         <div class="form-group">
-          <label for="nominalDiameter">呼び径（mm）</label>
+          <label for="nominalDiameter">呼び径</label>
           <input id="nominalDiameter" name="nominalDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
         </div>
         <div class="form-group">
@@ -495,13 +495,13 @@ function calculateJisFitTolerance() {
   }
 
   resultArea.innerHTML = createToleranceResultRows({
-    nominalDiameter: `${formatCompactNumber(diameter)} mm`,
+    nominalDiameter: formatCompactNumber(diameter),
     symbol,
-    upperTolerance: `${formatToleranceMicrometer(tolerance.upper)} μm`,
-    lowerTolerance: `${formatToleranceMicrometer(tolerance.lower)} μm`,
-    upperDimension: `${upperDimension.toFixed(3)} mm`,
-    lowerDimension: `${lowerDimension.toFixed(3)} mm`,
-    targetDimension: `${targetDimension.toFixed(3)} mm`
+    upperTolerance: formatToleranceMillimeter(tolerance.upper),
+    lowerTolerance: formatToleranceMillimeter(tolerance.lower),
+    upperDimension: upperDimension.toFixed(3),
+    lowerDimension: lowerDimension.toFixed(3),
+    targetDimension: targetDimension.toFixed(3)
   });
 }
 
@@ -528,8 +528,9 @@ function formatCompactNumber(value) {
   return Number.isInteger(value) ? String(value) : String(value);
 }
 
-function formatToleranceMicrometer(value) {
-  return Number.isInteger(value) ? String(value) : String(value);
+function formatToleranceMillimeter(value) {
+  const millimeterValue = value / 1000;
+  return millimeterValue === 0 ? "0" : millimeterValue.toFixed(3);
 }
 
 function renderTaperCalculator(calculator) {

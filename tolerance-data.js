@@ -475,13 +475,22 @@ const toleranceData = {
       { min: 250, max: 315, upper: 16, lower: -36 },
       { min: 315, max: 400, upper: 17, lower: -40 },
       { min: 400, max: 500, upper: 18, lower: -45 }
+    ],
+    X7: [
+      { min: 0, max: 3, upper: -20, lower: -30 },
+      { min: 3, max: 6, upper: -24, lower: -36 },
+      { min: 6, max: 10, upper: -28, lower: -43 },
+      { min: 10, max: 14, upper: -33, lower: -51 },
+      { min: 14, max: 18, upper: -38, lower: -56 },
+      { min: 18, max: 24, upper: -46, lower: -67 },
+      { min: 24, max: 30, upper: -56, lower: -77 }
     ]
   }
 };
 
 const toleranceSymbolOrder = {
   shaft: ["f6", "f7", "f8", "g5", "g6", "h5", "h6", "h7", "h8", "h9", "js5", "js6", "js7", "k5", "k6", "x6"],
-  hole: ["E7", "E8", "E9", "F6", "F7", "F8", "G6", "G7", "H6", "H7", "H8", "H9", "JS6", "JS7", "K6", "K7"]
+  hole: ["E7", "E8", "E9", "F6", "F7", "F8", "G6", "G7", "H6", "H7", "H8", "H9", "JS6", "JS7", "K6", "K7", "X7"]
 };
 
 window.toleranceData = toleranceData;
