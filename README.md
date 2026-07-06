@@ -42,12 +42,20 @@
 
 このリポジトリでは `gh-pages` ブランチをGitHub Pages公開用ブランチとして使います。
 
+このサイトはVite、React、npm buildを使わない静的HTMLサイトです。GitHub Pagesの公開方式は、A案の「`gh-pages` ブランチから公開する方式」に統一します。
+
+リポジトリに `.github/workflows` は置きません。GitHub Pagesが自動で表示する `pages-build-deployment` は、ブランチ公開方式でもGitHub側が内部で実行する公開ジョブです。
+
+`.nojekyll` を配置し、Jekyll変換を行わず静的ファイルをそのまま公開します。
+
 1. GitHubで `grinding-calculation-portal` リポジトリを開きます。
 2. `Settings` を開きます。
 3. `Pages` を開きます。
 4. `Build and deployment` の `Source` を `Deploy from a branch` にします。
 5. `Branch` を `gh-pages`、フォルダを `/root` にします。
 6. `Save` を押します。
+
+`Source` を `GitHub Actions` に変更しないでください。Actions方式にする場合は、別途 `.github/workflows` とデプロイ設定を追加する必要があります。
 
 公開URL:
 
