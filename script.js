@@ -26,6 +26,13 @@ const calculators = [
     render: renderWeightCalculator
   },
   {
+    id: "jis-fit-tolerance",
+    name: "JISはめあい公差検索",
+    status: "ready",
+    description: "呼び径と公差記号から、JISはめあい公差と狙い値を検索します。",
+    render: renderJisFitToleranceCalculator
+  },
+  {
     id: "taper-angle",
     name: "テーパー角度計算",
     status: "ready",
@@ -372,6 +379,157 @@ function createWeightResultRow(weight) {
       <div class="result-value">${weight}</div>
     </div>
   `;
+}
+
+function renderJisFitToleranceCalculator(calculator) {
+  app.innerHTML = `
+    <div class="panel-heading">
+      <h2>${calculator.name}</h2>
+      <p>${calculator.description}</p>
+    </div>
+    <div class="calculator-layout compact-calculator-layout">
+      <form class="form-panel" id="toleranceForm">
+        <div class="form-group">
+          <label for="nominalDiameter">呼び径（mm）</label>
+          <input id="nominalDiameter" name="nominalDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="toleranceSymbol">公差記号</label>
+          <select id="toleranceSymbol" name="toleranceSymbol">
+            <option value="">選択してください</option>
+            ${createToleranceOptions()}
+          </select>
+        </div>
+        <div class="action-row">
+          <button type="button" class="primary-button" id="clearToleranceButton">クリア</button>
+        </div>
+      </form>
+      <section class="result-panel tolerance-result-panel" aria-label="検索結果">
+        <h3>検索結果</h3>
+        <div id="toleranceResultArea" class="result-box">
+          ${createToleranceResultRows()}
+        </div>
+      </section>
+    </div>
+  `;
+
+  const form = document.getElementById("toleranceForm");
+  const inputs = form.querySelectorAll("input, select");
+  const clearButton = document.getElementById("clearToleranceButton");
+
+  inputs.forEach((input) => {
+    input.addEventListener("input", calculateJisFitTolerance);
+    input.addEventListener("change", calculateJisFitTolerance);
+  });
+
+  clearButton.addEventListener("click", () => {
+    document.getElementById("nominalDiameter").value = "";
+    document.getElementById("toleranceSymbol").value = "";
+    document.getElementById("toleranceResultArea").innerHTML = createToleranceResultRows();
+    document.getElementById("nominalDiameter").focus();
+  });
+
+  document.getElementById("nominalDiameter").focus();
+}
+
+function createToleranceOptions() {
+  const data = window.toleranceData || { shaft: {}, hole: {} };
+  const order = window.toleranceSymbolOrder || { shaft: [], hole: [] };
+  const shaftOptions = order.shaft
+    .filter((symbol) => data.shaft[symbol])
+    .map((symbol) => `<option value="${symbol}">${symbol}</option>`)
+    .join("");
+  const holeOptions = order.hole
+    .filter((symbol) => data.hole[symbol])
+    .map((symbol) => `<option value="${symbol}">${symbol}</option>`)
+    .join("");
+
+  return `
+    <optgroup label="軸公差">
+      ${shaftOptions}
+    </optgroup>
+    <optgroup label="穴公差">
+      ${holeOptions}
+    </optgroup>
+  `;
+}
+
+function calculateJisFitTolerance() {
+  const nominalDiameter = document.getElementById("nominalDiameter").value;
+  const symbol = document.getElementById("toleranceSymbol").value;
+  const resultArea = document.getElementById("toleranceResultArea");
+  const values = [{ label: "呼び径", value: nominalDiameter }];
+  const error = validateInputs(values);
+
+  if (error) {
+    resultArea.innerHTML = `<div class="error-message">${error}</div>`;
+    return;
+  }
+
+  if (symbol === "") {
+    resultArea.innerHTML = `<div class="error-message">公差記号を選択してください</div>`;
+    return;
+  }
+
+  const data = window.toleranceData || { shaft: {}, hole: {} };
+  const type = data.shaft[symbol] ? "shaft" : data.hole[symbol] ? "hole" : "";
+  if (!type) {
+    resultArea.innerHTML = `<div class="error-message">該当するJIS公差データが登録されていません。</div>`;
+    return;
+  }
+
+  const diameter = Number(nominalDiameter);
+  const tolerance = data[type][symbol].find((item) => item.min < diameter && diameter <= item.max);
+  if (!tolerance) {
+    resultArea.innerHTML = `<div class="error-message">該当するJIS公差データが登録されていません。</div>`;
+    return;
+  }
+
+  const upperDimension = diameter + tolerance.upper / 1000;
+  const lowerDimension = diameter + tolerance.lower / 1000;
+  const targetDimension = diameter + ((tolerance.upper / 1000 + tolerance.lower / 1000) / 2);
+
+  if (![upperDimension, lowerDimension, targetDimension].every(Number.isFinite)) {
+    resultArea.innerHTML = `<div class="error-message">計算不能です。入力値を確認してください</div>`;
+    return;
+  }
+
+  resultArea.innerHTML = createToleranceResultRows({
+    nominalDiameter: `${formatCompactNumber(diameter)} mm`,
+    symbol,
+    upperTolerance: `${formatToleranceMicrometer(tolerance.upper)} μm`,
+    lowerTolerance: `${formatToleranceMicrometer(tolerance.lower)} μm`,
+    upperDimension: `${upperDimension.toFixed(3)} mm`,
+    lowerDimension: `${lowerDimension.toFixed(3)} mm`,
+    targetDimension: `${targetDimension.toFixed(3)} mm`
+  });
+}
+
+function createToleranceResultRows(result = {}) {
+  const rows = [
+    { label: "狙い値", value: result.targetDimension || "-", className: "target-result-row" },
+    { label: "呼び径", value: result.nominalDiameter || "-" },
+    { label: "公差記号", value: result.symbol || "-" },
+    { label: "上限公差", value: result.upperTolerance || "-" },
+    { label: "下限公差", value: result.lowerTolerance || "-" },
+    { label: "上限寸法", value: result.upperDimension || "-" },
+    { label: "下限寸法", value: result.lowerDimension || "-" }
+  ];
+
+  return rows.map((row) => `
+    <div class="result-row ${row.className || ""}">
+      <div class="result-label">${row.label}</div>
+      <div class="result-value">${row.value}</div>
+    </div>
+  `).join("");
+}
+
+function formatCompactNumber(value) {
+  return Number.isInteger(value) ? String(value) : String(value);
+}
+
+function formatToleranceMicrometer(value) {
+  return Number.isInteger(value) ? String(value) : String(value);
 }
 
 function renderTaperCalculator(calculator) {

@@ -186,7 +186,20 @@ input[type="number"] {
   font-weight: 800;
 }
 
-input[type="number"]:focus {
+select {
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 14px;
+  border: 2px solid #a8a8a8;
+  border-radius: 2px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 23px;
+  font-weight: 800;
+}
+
+input[type="number"]:focus,
+select:focus {
   border-color: var(--main-color);
   outline: 3px solid rgba(30, 74, 141, 0.16);
 }
@@ -268,6 +281,19 @@ input[type="number"]:focus {
   text-align: right;
   font-size: 25px;
   font-weight: 900;
+}
+
+.target-result-row {
+  background: #f8fafc;
+}
+
+.target-result-row .result-label {
+  color: var(--main-color);
+}
+
+.target-result-row .result-value {
+  color: var(--main-color);
+  font-size: 31px;
 }
 
 .error-message {
@@ -400,14 +426,14 @@ input[type="number"]:focus {
   }
 
   .menu-buttons {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 5px;
   }
 
   .menu-button {
     min-height: 38px;
     padding: 4px 3px;
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.2;
   }
 
@@ -479,6 +505,12 @@ input[type="number"]:focus {
     font-size: 16px;
   }
 
+  select {
+    min-height: 34px;
+    padding: 4px 6px;
+    font-size: 16px;
+  }
+
   .fixed-condition {
     padding: 6px;
     font-size: 11px;
@@ -517,6 +549,10 @@ input[type="number"]:focus {
     text-align: right;
     font-size: 15px;
     line-height: 1.2;
+  }
+
+  .target-result-row .result-value {
+    font-size: 18px;
   }
 
   .error-message {
