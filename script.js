@@ -3,7 +3,7 @@ const calculators = [
     id: "cylindrical-grinding",
     name: "円筒研削条件計算",
     status: "ready",
-    description: "砥石周速、砥石直径、切込みから研削条件を計算します。",
+    description: "品物周速、品物直径、切込みから研削条件を計算します。",
     render: renderCylindricalGrindingCalculator
   },
   {
@@ -27,9 +27,9 @@ const calculators = [
   },
   {
     id: "jis-fit-tolerance",
-    name: "JISはめあい公差検索",
+    name: "はめあい公差",
     status: "ready",
-    description: "呼び径と公差記号から、JISはめあい公差と狙い値を検索します。",
+    description: "呼び径と公差記号から、はめあい公差と狙い値を検索します。",
     render: renderJisFitToleranceCalculator
   },
   {
@@ -110,11 +110,11 @@ function renderCylindricalGrindingCalculator(calculator) {
     <div class="calculator-layout">
       <form class="form-panel" id="grindingForm">
         <div class="form-group">
-          <label for="wheelSpeed">砥石周速 a（m/min）</label>
+          <label for="wheelSpeed">品物周速 a（m/min）</label>
           <input id="wheelSpeed" name="wheelSpeed" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
         </div>
         <div class="form-group">
-          <label for="wheelDiameter">砥石直径 b（mm）</label>
+          <label for="wheelDiameter">品物直径 b（mm）</label>
           <input id="wheelDiameter" name="wheelDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
         </div>
         <div class="form-group">
@@ -160,8 +160,8 @@ function calculateCylindricalGrinding() {
   const resultArea = document.getElementById("resultArea");
 
   const values = [
-    { label: "砥石周速 a", value: wheelSpeed },
-    { label: "砥石直径 b", value: wheelDiameter },
+    { label: "品物周速 a", value: wheelSpeed },
+    { label: "品物直径 b", value: wheelDiameter },
     { label: "切込み e", value: cutDepth }
   ];
 
@@ -176,7 +176,7 @@ function calculateCylindricalGrinding() {
   const e = Number(cutDepth);
 
   if (b === 0) {
-    resultArea.innerHTML = `<div class="error-message">砥石直径 b は0より大きい数値を入力してください</div>`;
+    resultArea.innerHTML = `<div class="error-message">品物直径 b は0より大きい数値を入力してください</div>`;
     return;
   }
 
@@ -487,7 +487,8 @@ function calculateJisFitTolerance() {
 
   const upperDimension = diameter + tolerance.upper / 1000;
   const lowerDimension = diameter + tolerance.lower / 1000;
-  const targetDimension = diameter + ((tolerance.upper / 1000 + tolerance.lower / 1000) / 2);
+  const targetOffset = type === "shaft" ? 0.001 : -0.001;
+  const targetDimension = diameter + ((tolerance.upper / 1000 + tolerance.lower / 1000) / 2) + targetOffset;
 
   if (![upperDimension, lowerDimension, targetDimension].every(Number.isFinite)) {
     resultArea.innerHTML = `<div class="error-message">計算不能です。入力値を確認してください</div>`;
@@ -499,9 +500,9 @@ function calculateJisFitTolerance() {
     symbol,
     upperTolerance: formatToleranceMillimeter(tolerance.upper),
     lowerTolerance: formatToleranceMillimeter(tolerance.lower),
-    upperDimension: upperDimension.toFixed(3),
-    lowerDimension: lowerDimension.toFixed(3),
-    targetDimension: targetDimension.toFixed(3)
+    upperDimension: formatMillimeterValue(upperDimension),
+    lowerDimension: formatMillimeterValue(lowerDimension),
+    targetDimension: formatMillimeterValue(targetDimension)
   });
 }
 
@@ -531,6 +532,10 @@ function formatCompactNumber(value) {
 function formatToleranceMillimeter(value) {
   const millimeterValue = value / 1000;
   return millimeterValue === 0 ? "0" : millimeterValue.toFixed(3);
+}
+
+function formatMillimeterValue(value) {
+  return (Math.round((value + 1e-9) * 1000) / 1000).toFixed(3);
 }
 
 function renderTaperCalculator(calculator) {
