@@ -568,7 +568,7 @@ function renderTaperCalculator(calculator) {
         <div id="taperResultArea" class="result-box">
           ${createTaperResultRows([{ label: "結果", value: "-" }])}
         </div>
-        <p class="calculation-note">本計算は一般的な円錐テーパーを対象としています。角度は片側角度を基準に計算しています。図面が片側角度か全角度かを確認して使用してください。</p>
+        <p class="calculation-note">軸方向長さは中心線方向の長さです。直線距離はテーパー面に沿った長さです。勾配は1:Xで入力してください。図面寸法を確認して使用してください。</p>
       </section>
     </div>
   `;
@@ -594,8 +594,12 @@ function setTaperMode(mode) {
   const form = document.getElementById("taperForm");
   form.querySelectorAll("input").forEach((input) => {
     input.addEventListener("input", calculateTaper);
-    input.addEventListener("change", calculateTaper);
+    input.addEventListener("change", () => {
+      updateTaperConditionalFields();
+      calculateTaper();
+    });
   });
+  updateTaperConditionalFields();
 
   const firstInput = form.querySelector("input[type='number']");
   if (firstInput) {
@@ -611,12 +615,46 @@ function getTaperInputs(mode) {
         <input id="baseDiameter" name="baseDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
       </div>
       <div class="form-group">
-        <label for="diameterLength">テーパー長 L（mm）</label>
+        <div class="field-label">長さ入力</div>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="diameterLengthMethod" value="axis" checked>
+            軸方向長さ
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="diameterLengthMethod" value="straight">
+            直線距離
+          </label>
+        </div>
+      </div>
+      <div class="form-group conditional-field" data-taper-field="diameter-length" data-method="axis">
+        <label for="diameterLength">軸方向長さ L（mm）</label>
         <input id="diameterLength" name="diameterLength" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
       </div>
+      <div class="form-group conditional-field" data-taper-field="diameter-length" data-method="straight">
+        <label for="diameterStraightDistance">直線距離 S（mm）</label>
+        <input id="diameterStraightDistance" name="diameterStraightDistance" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
       <div class="form-group">
+        <div class="field-label">角度入力</div>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="diameterAngleMethod" value="angle" checked>
+            片側角度
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="diameterAngleMethod" value="slope">
+            勾配 1:X
+          </label>
+        </div>
+      </div>
+      <div class="form-group conditional-field" data-taper-field="diameter-angle" data-method="angle">
         <label for="diameterAngle">片側角度 θ（度）</label>
         <input id="diameterAngle" name="diameterAngle" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+      <div class="form-group conditional-field" data-taper-field="diameter-angle" data-method="slope">
+        <label for="diameterSlope">勾配 1:X</label>
+        <input id="diameterSlope" name="diameterSlope" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
       </div>
       <div class="form-group">
         <div class="field-label">計算方向</div>
@@ -645,8 +683,25 @@ function getTaperInputs(mode) {
         <input id="lengthSmallDiameter" name="lengthSmallDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
       </div>
       <div class="form-group">
+        <div class="field-label">角度入力</div>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="lengthAngleMethod" value="angle" checked>
+            片側角度
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="lengthAngleMethod" value="slope">
+            勾配 1:X
+          </label>
+        </div>
+      </div>
+      <div class="form-group conditional-field" data-taper-field="length-angle" data-method="angle">
         <label for="lengthAngle">片側角度 θ（度）</label>
         <input id="lengthAngle" name="lengthAngle" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+      </div>
+      <div class="form-group conditional-field" data-taper-field="length-angle" data-method="slope">
+        <label for="lengthSlope">勾配 1:X</label>
+        <input id="lengthSlope" name="lengthSlope" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
       </div>
     `;
   }
@@ -661,10 +716,51 @@ function getTaperInputs(mode) {
       <input id="smallDiameter" name="smallDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
     </div>
     <div class="form-group">
-      <label for="taperLength">テーパー長 L（mm）</label>
+      <div class="field-label">入力方法</div>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="angleInputMethod" value="axis" checked>
+          軸方向長さ
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="angleInputMethod" value="straight">
+          直線距離
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="angleInputMethod" value="slope">
+          勾配 1:X
+        </label>
+      </div>
+    </div>
+    <div class="form-group conditional-field" data-taper-field="angle-method" data-method="axis">
+      <label for="taperLength">軸方向長さ L（mm）</label>
       <input id="taperLength" name="taperLength" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
     </div>
+    <div class="form-group conditional-field" data-taper-field="angle-method" data-method="straight">
+      <label for="straightDistance">直線距離 S（mm）</label>
+      <input id="straightDistance" name="straightDistance" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+    </div>
+    <div class="form-group conditional-field" data-taper-field="angle-method" data-method="slope">
+      <label for="slopeValue">勾配 1:X</label>
+      <input id="slopeValue" name="slopeValue" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
+    </div>
   `;
+}
+
+function updateTaperConditionalFields() {
+  const form = document.getElementById("taperForm");
+  if (!form) return;
+
+  const activeMethods = {
+    "angle-method": form.querySelector("input[name='angleInputMethod']:checked")?.value,
+    "diameter-length": form.querySelector("input[name='diameterLengthMethod']:checked")?.value,
+    "diameter-angle": form.querySelector("input[name='diameterAngleMethod']:checked")?.value,
+    "length-angle": form.querySelector("input[name='lengthAngleMethod']:checked")?.value
+  };
+
+  form.querySelectorAll(".conditional-field").forEach((field) => {
+    field.hidden = activeMethods[field.dataset.taperField] !== field.dataset.method;
+  });
 }
 
 function calculateTaper() {
@@ -687,66 +783,120 @@ function calculateTaper() {
 function calculateTaperAngle() {
   const largeDiameter = document.getElementById("largeDiameter").value;
   const smallDiameter = document.getElementById("smallDiameter").value;
+  const inputMethod = document.querySelector("input[name='angleInputMethod']:checked").value;
   const taperLength = document.getElementById("taperLength").value;
+  const straightDistance = document.getElementById("straightDistance").value;
+  const slopeValue = document.getElementById("slopeValue").value;
   const values = [
     { label: "大径 D", value: largeDiameter },
-    { label: "小径 d", value: smallDiameter },
-    { label: "テーパー長 L", value: taperLength }
+    { label: "小径 d", value: smallDiameter }
   ];
+  if (inputMethod === "axis") values.push({ label: "軸方向長さ L", value: taperLength });
+  if (inputMethod === "straight") values.push({ label: "直線距離 S", value: straightDistance });
+  if (inputMethod === "slope") values.push({ label: "勾配 1:X", value: slopeValue });
+
   const error = validateInputs(values);
   if (error) return { error };
 
   const D = Number(largeDiameter);
   const d = Number(smallDiameter);
-  const L = Number(taperLength);
   if (D <= d) {
     return { error: "大径 D は小径 d より大きい数値を入力してください" };
   }
 
   const diameterDifference = D - d;
-  const oneSideAngle = radToDeg(Math.atan((diameterDifference / 2) / L));
-  const fullAngle = oneSideAngle * 2;
-  const slopeValue = L / diameterDifference;
+  const radiusDifference = diameterDifference / 2;
+  let oneSideAngle = 0;
+  let axialLength = 0;
+  let taperStraightDistance = 0;
+  let slope = null;
 
-  if (![diameterDifference, oneSideAngle, fullAngle, slopeValue].every(Number.isFinite)) {
+  if (inputMethod === "axis") {
+    axialLength = Number(taperLength);
+    oneSideAngle = radToDeg(Math.atan(radiusDifference / axialLength));
+    taperStraightDistance = radiusDifference / Math.sin(degToRad(oneSideAngle));
+  }
+
+  if (inputMethod === "straight") {
+    taperStraightDistance = Number(straightDistance);
+    if (taperStraightDistance <= radiusDifference) {
+      return { error: "直線距離 S は半径差より大きい数値を入力してください" };
+    }
+    oneSideAngle = radToDeg(Math.asin(radiusDifference / taperStraightDistance));
+    axialLength = radiusDifference / Math.tan(degToRad(oneSideAngle));
+  }
+
+  if (inputMethod === "slope") {
+    slope = Number(slopeValue);
+    oneSideAngle = radToDeg(Math.atan(1 / (2 * slope)));
+    axialLength = radiusDifference / Math.tan(degToRad(oneSideAngle));
+    taperStraightDistance = radiusDifference / Math.sin(degToRad(oneSideAngle));
+  }
+
+  if (![diameterDifference, radiusDifference, oneSideAngle, axialLength, taperStraightDistance].every(Number.isFinite)) {
     return { error: "計算不能です。入力値を確認してください" };
   }
 
   return {
-    rows: [
-      { label: "径差", value: `${diameterDifference.toFixed(3)} mm` },
-      { label: "片側角度", value: `${oneSideAngle.toFixed(4)} °` },
-      { label: "片側角度（度分秒）", value: formatDms(oneSideAngle) },
-      { label: "全角度", value: `${fullAngle.toFixed(4)} °` },
-      { label: "全角度（度分秒）", value: formatDms(fullAngle) },
-      { label: "勾配", value: `1/${slopeValue.toFixed(3)}` }
-    ]
+    rows: createCommonTaperRows({
+      diameterDifference,
+      radiusDifference,
+      oneSideAngle,
+      axialLength,
+      straightDistance: taperStraightDistance,
+      slopeValue: slope
+    })
   };
 }
 
 function calculateTaperDiameter() {
   const baseDiameter = document.getElementById("baseDiameter").value;
+  const lengthMethod = document.querySelector("input[name='diameterLengthMethod']:checked").value;
+  const angleMethod = document.querySelector("input[name='diameterAngleMethod']:checked").value;
   const diameterLength = document.getElementById("diameterLength").value;
+  const diameterStraightDistance = document.getElementById("diameterStraightDistance").value;
   const diameterAngle = document.getElementById("diameterAngle").value;
+  const diameterSlope = document.getElementById("diameterSlope").value;
   const direction = document.querySelector("input[name='diameterDirection']:checked").value;
-  const values = [
-    { label: "基準径", value: baseDiameter },
-    { label: "テーパー長 L", value: diameterLength },
-    { label: "片側角度 θ", value: diameterAngle }
-  ];
+  const values = [{ label: "基準径", value: baseDiameter }];
+  if (lengthMethod === "axis") values.push({ label: "軸方向長さ L", value: diameterLength });
+  if (lengthMethod === "straight") values.push({ label: "直線距離 S", value: diameterStraightDistance });
+  if (angleMethod === "angle") values.push({ label: "片側角度 θ", value: diameterAngle });
+  if (angleMethod === "slope") values.push({ label: "勾配 1:X", value: diameterSlope });
+
   const error = validateInputs(values);
   if (error) return { error };
 
   const base = Number(baseDiameter);
-  const L = Number(diameterLength);
-  const theta = Number(diameterAngle);
-  const diameterDifference = 2 * L * Math.tan(degToRad(theta));
+  const theta = angleMethod === "angle"
+    ? Number(diameterAngle)
+    : radToDeg(Math.atan(1 / (2 * Number(diameterSlope))));
+
+  if (theta <= 0) {
+    return { error: "片側角度 θ は0より大きい数値を入力してください" };
+  }
+
+  let axialLength = 0;
+  let taperStraightDistance = 0;
+  let diameterDifference = 0;
+
+  if (lengthMethod === "axis") {
+    axialLength = Number(diameterLength);
+    diameterDifference = 2 * axialLength * Math.tan(degToRad(theta));
+    taperStraightDistance = (diameterDifference / 2) / Math.sin(degToRad(theta));
+  } else {
+    taperStraightDistance = Number(diameterStraightDistance);
+    diameterDifference = 2 * taperStraightDistance * Math.sin(degToRad(theta));
+    axialLength = (diameterDifference / 2) / Math.tan(degToRad(theta));
+  }
+
+  const radiusDifference = diameterDifference / 2;
   const calculatedDiameter = direction === "largeToSmall"
     ? base - diameterDifference
     : base + diameterDifference;
   const calculatedLabel = direction === "largeToSmall" ? "計算後の径（小径）" : "計算後の径（大径）";
 
-  if (![diameterDifference, calculatedDiameter].every(Number.isFinite)) {
+  if (![diameterDifference, radiusDifference, calculatedDiameter, axialLength, taperStraightDistance].every(Number.isFinite)) {
     return { error: "計算不能です。入力値を確認してください" };
   }
 
@@ -755,46 +905,62 @@ function calculateTaperDiameter() {
   }
 
   return {
-    rows: [
-      { label: "径差", value: `${diameterDifference.toFixed(3)} mm` },
-      { label: calculatedLabel, value: `${calculatedDiameter.toFixed(3)} mm` },
-      { label: "全角度", value: `${(theta * 2).toFixed(4)} °` }
-    ]
+    rows: createCommonTaperRows({
+      diameterDifference,
+      radiusDifference,
+      oneSideAngle: theta,
+      axialLength,
+      straightDistance: taperStraightDistance,
+      slopeValue: angleMethod === "slope" ? Number(diameterSlope) : null,
+      extraRows: [{ label: calculatedLabel, value: `${calculatedDiameter.toFixed(3)} mm` }]
+    })
   };
 }
 
 function calculateTaperLength() {
   const largeDiameter = document.getElementById("lengthLargeDiameter").value;
   const smallDiameter = document.getElementById("lengthSmallDiameter").value;
+  const angleMethod = document.querySelector("input[name='lengthAngleMethod']:checked").value;
   const taperAngle = document.getElementById("lengthAngle").value;
+  const lengthSlope = document.getElementById("lengthSlope").value;
   const values = [
     { label: "大径 D", value: largeDiameter },
-    { label: "小径 d", value: smallDiameter },
-    { label: "片側角度 θ", value: taperAngle }
+    { label: "小径 d", value: smallDiameter }
   ];
+  if (angleMethod === "angle") values.push({ label: "片側角度 θ", value: taperAngle });
+  if (angleMethod === "slope") values.push({ label: "勾配 1:X", value: lengthSlope });
+
   const error = validateInputs(values);
   if (error) return { error };
 
   const D = Number(largeDiameter);
   const d = Number(smallDiameter);
-  const theta = Number(taperAngle);
+  const theta = angleMethod === "angle"
+    ? Number(taperAngle)
+    : radToDeg(Math.atan(1 / (2 * Number(lengthSlope))));
+
   if (D <= d) {
     return { error: "大径 D は小径 d より大きい数値を入力してください" };
   }
 
   const diameterDifference = D - d;
-  const taperLength = (diameterDifference / 2) / Math.tan(degToRad(theta));
+  const radiusDifference = diameterDifference / 2;
+  const taperLength = radiusDifference / Math.tan(degToRad(theta));
+  const straightDistance = radiusDifference / Math.sin(degToRad(theta));
 
-  if (![diameterDifference, taperLength].every(Number.isFinite) || taperLength <= 0) {
+  if (![diameterDifference, radiusDifference, taperLength, straightDistance].every(Number.isFinite) || taperLength <= 0 || straightDistance <= 0) {
     return { error: "計算不能です。入力値を確認してください" };
   }
 
   return {
-    rows: [
-      { label: "径差", value: `${diameterDifference.toFixed(3)} mm` },
-      { label: "テーパー長", value: `${taperLength.toFixed(3)} mm` },
-      { label: "全角度", value: `${(theta * 2).toFixed(4)} °` }
-    ]
+    rows: createCommonTaperRows({
+      diameterDifference,
+      radiusDifference,
+      oneSideAngle: theta,
+      axialLength: taperLength,
+      straightDistance,
+      slopeValue: angleMethod === "slope" ? Number(lengthSlope) : null
+    })
   };
 }
 
@@ -807,6 +973,10 @@ function clearTaperInputs() {
   if (firstDirection) {
     firstDirection.checked = true;
   }
+  form.querySelectorAll("input[type='radio']").forEach((input) => {
+    input.checked = input.defaultChecked;
+  });
+  updateTaperConditionalFields();
   document.getElementById("taperResultArea").innerHTML = createTaperResultRows([{ label: "結果", value: "-" }]);
 
   const firstInput = form.querySelector("input[type='number']");
@@ -822,6 +992,33 @@ function createTaperResultRows(rows) {
       <div class="result-value">${row.value}</div>
     </div>
   `).join("");
+}
+
+function createCommonTaperRows({
+  diameterDifference,
+  radiusDifference,
+  oneSideAngle,
+  axialLength,
+  straightDistance,
+  slopeValue = null,
+  extraRows = []
+}) {
+  const rows = [
+    { label: "径差", value: `${diameterDifference.toFixed(3)} mm` },
+    { label: "半径差", value: `${radiusDifference.toFixed(3)} mm` },
+    { label: "片側角度", value: `${oneSideAngle.toFixed(4)} °` },
+    { label: "片側角度（度分秒）", value: formatDms(oneSideAngle) },
+    { label: "全角度", value: `${(oneSideAngle * 2).toFixed(4)} °` },
+    { label: "全角度（度分秒）", value: formatDms(oneSideAngle * 2) },
+    { label: "軸方向長さ", value: `${axialLength.toFixed(3)} mm` },
+    { label: "直線距離", value: `${straightDistance.toFixed(3)} mm` }
+  ];
+
+  if (slopeValue !== null) {
+    rows.push({ label: "勾配", value: `1:${slopeValue.toFixed(3)}` });
+  }
+
+  return rows.concat(extraRows);
 }
 
 function degToRad(degrees) {

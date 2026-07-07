@@ -233,6 +233,60 @@ const toleranceData = {
       { min: 14, max: 18, upper: 56, lower: 45 },
       { min: 18, max: 24, upper: 67, lower: 54 },
       { min: 24, max: 30, upper: 77, lower: 64 }
+    ],
+    x7: [
+      { min: 0, max: 3, upper: 30, lower: 20 },
+      { min: 3, max: 6, upper: 40, lower: 28 },
+      { min: 6, max: 10, upper: 49, lower: 34 },
+      { min: 10, max: 14, upper: 58, lower: 40 },
+      { min: 14, max: 18, upper: 63, lower: 45 },
+      { min: 18, max: 24, upper: 75, lower: 54 },
+      { min: 24, max: 30, upper: 85, lower: 64 },
+      { min: 30, max: 40, upper: 105, lower: 80 },
+      { min: 40, max: 50, upper: 122, lower: 97 },
+      { min: 50, max: 65, upper: 152, lower: 122 },
+      { min: 65, max: 80, upper: 176, lower: 146 },
+      { min: 80, max: 100, upper: 213, lower: 178 },
+      { min: 100, max: 120, upper: 245, lower: 210 },
+      { min: 120, max: 140, upper: 288, lower: 248 },
+      { min: 140, max: 160, upper: 320, lower: 280 },
+      { min: 160, max: 180, upper: 350, lower: 310 },
+      { min: 180, max: 200, upper: 396, lower: 350 },
+      { min: 200, max: 225, upper: 431, lower: 385 },
+      { min: 225, max: 250, upper: 471, lower: 425 },
+      { min: 250, max: 280, upper: 527, lower: 475 },
+      { min: 280, max: 315, upper: 577, lower: 525 },
+      { min: 315, max: 355, upper: 647, lower: 590 },
+      { min: 355, max: 400, upper: 717, lower: 660 },
+      { min: 400, max: 450, upper: 803, lower: 740 },
+      { min: 450, max: 500, upper: 883, lower: 820 }
+    ],
+    x8: [
+      { min: 0, max: 3, upper: 34, lower: 20 },
+      { min: 3, max: 6, upper: 46, lower: 28 },
+      { min: 6, max: 10, upper: 56, lower: 34 },
+      { min: 10, max: 14, upper: 67, lower: 40 },
+      { min: 14, max: 18, upper: 72, lower: 45 },
+      { min: 18, max: 24, upper: 87, lower: 54 },
+      { min: 24, max: 30, upper: 97, lower: 64 },
+      { min: 30, max: 40, upper: 119, lower: 80 },
+      { min: 40, max: 50, upper: 136, lower: 97 },
+      { min: 50, max: 65, upper: 168, lower: 122 },
+      { min: 65, max: 80, upper: 192, lower: 146 },
+      { min: 80, max: 100, upper: 232, lower: 178 },
+      { min: 100, max: 120, upper: 264, lower: 210 },
+      { min: 120, max: 140, upper: 311, lower: 248 },
+      { min: 140, max: 160, upper: 343, lower: 280 },
+      { min: 160, max: 180, upper: 373, lower: 310 },
+      { min: 180, max: 200, upper: 422, lower: 350 },
+      { min: 200, max: 225, upper: 457, lower: 385 },
+      { min: 225, max: 250, upper: 497, lower: 425 },
+      { min: 250, max: 280, upper: 556, lower: 475 },
+      { min: 280, max: 315, upper: 606, lower: 525 },
+      { min: 315, max: 355, upper: 679, lower: 590 },
+      { min: 355, max: 400, upper: 749, lower: 660 },
+      { min: 400, max: 450, upper: 837, lower: 740 },
+      { min: 450, max: 500, upper: 917, lower: 820 }
     ]
   },
   hole: {
@@ -489,8 +543,8 @@ const toleranceData = {
 };
 
 const toleranceSymbolOrder = {
-  shaft: ["f6", "f7", "f8", "g5", "g6", "h5", "h6", "h7", "h8", "h9", "js5", "js6", "js7", "k5", "k6", "x6"],
-  hole: ["E7", "E8", "E9", "F6", "F7", "F8", "G6", "G7", "H6", "H7", "H8", "H9", "JS6", "JS7", "K6", "K7", "X7"]
+  shaft: ["f6", "f7", "f8", "g5", "g6", "h5", "h6", "h7", "h8", "h9", "js5", "js6", "js7", "k5", "k6", "x6", "x7", "x8"],
+  hole: ["E7", "E8", "E9", "F6", "F7", "F8", "G6", "G7", "H6", "H7", "H8", "H9", "JS6", "JS7", "K6", "K7"]
 };
 
 window.toleranceData = toleranceData;
