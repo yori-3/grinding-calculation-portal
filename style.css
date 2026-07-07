@@ -312,6 +312,26 @@ select:focus {
   font-weight: 700;
 }
 
+.formula-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  background: #f8fafc;
+  color: var(--muted-color);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.formula-note h4 {
+  margin: 0 0 6px;
+  color: var(--main-color);
+  font-size: 14px;
+}
+
+.formula-note p {
+  margin: 2px 0;
+}
+
 .empty-state {
   padding: 42px;
   border: 2px solid var(--border-color);

@@ -118,7 +118,7 @@ function renderCylindricalGrindingCalculator(calculator) {
           <input id="wheelDiameter" name="wheelDiameter" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
         </div>
         <div class="form-group">
-          <label for="cutDepth">切込み e（mm）</label>
+          <label for="cutDepth">切込み e（mm/rev）</label>
           <input id="cutDepth" name="cutDepth" type="number" inputmode="decimal" min="0" step="any" autocomplete="off">
         </div>
         <div class="action-row">
@@ -129,6 +129,13 @@ function renderCylindricalGrindingCalculator(calculator) {
         <h3>計算結果</h3>
         <div id="resultArea" class="result-box">
           ${createResultRows("-", "-", "-", "-")}
+        </div>
+        <div class="formula-note" aria-label="計算式">
+          <h4>計算式</h4>
+          <p>主軸回転数 f = (60 × a ÷ π ÷ b) × 1000</p>
+          <p>荒入力値 = f × e</p>
+          <p>精研入力値 = (f × e) ÷ 3</p>
+          <p>仕上入力値 = (f × e) ÷ 9</p>
         </div>
       </section>
     </div>
@@ -192,9 +199,9 @@ function calculateCylindricalGrinding() {
 
   const results = {
     spindleSpeed: `${spindleSpeed.toFixed(1)} rpm`,
-    roughCut: `${roughCut.toFixed(3)} mm`,
-    fineCut: `${fineCut.toFixed(3)} mm`,
-    finishCut: `${finishCut.toFixed(3)} mm`
+    roughCut: `${roughCut.toFixed(3)} mm/min`,
+    fineCut: `${fineCut.toFixed(3)} mm/min`,
+    finishCut: `${finishCut.toFixed(3)} mm/min`
   };
 
   resultArea.innerHTML = createResultRows(
@@ -236,15 +243,15 @@ function createResultRows(spindleSpeed, roughCut, fineCut, finishCut) {
       <div class="result-value">${spindleSpeed}</div>
     </div>
     <div class="result-row">
-      <div class="result-label">荒切込</div>
+      <div class="result-label">荒入力値</div>
       <div class="result-value">${roughCut}</div>
     </div>
     <div class="result-row">
-      <div class="result-label">精研切込</div>
+      <div class="result-label">精研入力値</div>
       <div class="result-value">${fineCut}</div>
     </div>
     <div class="result-row">
-      <div class="result-label">仕上切込</div>
+      <div class="result-label">仕上入力値</div>
       <div class="result-value">${finishCut}</div>
     </div>
   `;
